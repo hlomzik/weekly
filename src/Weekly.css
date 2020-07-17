@@ -1,0 +1,32 @@
+.weekly-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr) auto;
+  text-align: center;
+  grid-gap: 0.4em;
+  margin: 0.4em;
+}
+
+.weekly-day {
+  background: orange;
+  border-radius: 4px;
+  padding: 0.5em;
+}
+
+.weekly-days {
+  margin: auto;
+  opacity: 0.6;
+}
+
+.weekly-gap {
+  grid-column: 1 / span 7;
+  margin: 0.2em auto;
+  width: 0.4em;
+  height: 0.4em;
+  background: lightgrey;
+  border-radius: 100%;
+  box-shadow: 1em 0 lightgrey, -1em 0 lightgrey;
+}
+
+.weekly-gap + .weekly-day {
+  grid-column: 1;
+}
