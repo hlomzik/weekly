@@ -28,13 +28,13 @@ const data = {
 };
 
 export const Simple = () => (
-  <Weekly data={data.one_day} onClick={action('clicked')} />
+  <Weekly data={data.one_day} color="rgb(128, 255, 155)" onClick={action('clicked')} />
 );
 
 export const Month = () => (
-  <Weekly data={data.month} onClick={action('clicked')} />
+  <Weekly data={data.month} color="#f80" onClick={action('clicked')} />
 );
 
 export const Sparse = () => (
-  <Weekly data={data.sparse} onClick={action('clicked')} />
+  <Weekly data={data.sparse} color="#dead00" onClick={action('clicked')} />
 );

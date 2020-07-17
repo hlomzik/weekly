@@ -21,13 +21,48 @@ const datesOfTheWeek = (year, week) => {
 
 const formatDate = (date, locale) => date.toLocaleString(locale, {day:'numeric', month: 'numeric'});
 
-const Week = ({ week, withGap }) => {
+const getMinMax = (values) => {
+  if (!values || !values.length) return [-Infinity, Infinity];
+  let min = values[0];
+  let max = min;
+  for (let v of values) {
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
+  return [min, max];
+}
+
+const MIN_OPACITY = 0.3;
+
+const interpolate = (color, value, [min, max]) => {
+  if (value === undefined || value === null) return '#eee';
+
+  const opacity = (min === max)
+    ? 1
+    : MIN_OPACITY + (1 - MIN_OPACITY) * (value - min) / (max - min);
+
+  if (color.startsWith('#')) {
+    return color + parseInt((color.length === 4 ? 15 : 255) * opacity).toString(16);
+  }
+  if (color.startsWith('rgba')) {
+    return color.replace(/[\d.]+\)/, a => (a * opacity).toFixed(1));
+  }
+  if (color.startsWith('rgb')) {
+    return color.replace(')', opacity.toFixed(1));
+  }
+  return color;
+}
+
+const Week = ({ color = 'orange', minmax, week, withGap }) => {
   const days = Object.keys(week);
   return (
     <div className="weekly-week">
       {withGap && <div className="weekly-gap" />}
       {days.map(day => (
-        <div className="weekly-day">{week[day]}</div>
+        <div
+          className="weekly-day"
+          style={{ backgroundColor: interpolate(color, week[day], minmax) }}
+        >{week[day]}</div>
       ))}
       <div className="weekly-days">
         {formatDate(new Date(days[0]))}&nbsp;&ndash;&nbsp;{formatDate(new Date(days[6]))}
@@ -36,13 +71,15 @@ const Week = ({ week, withGap }) => {
   );
 }
 
-export const Weekly = ({ data, locale }) => {
+export const Weekly = ({ color, data, locale }) => {
   const days = Object.keys(data).sort();
   const weeks = {};
   const first = new Date(days[0]);
   const year = first.getFullYear();
   const jan1 = new Date(year, 0, 1);
   const firstDateOfTheFirstWeek = jan1 - DAY * dayOfTheWeek(jan1.getDay());
+
+  const [min, max] = getMinMax(Object.values(data));
 
   for (let day of days) {
     const week = Math.floor((new Date(day) - firstDateOfTheFirstWeek) / (DAY*7));
@@ -56,7 +93,12 @@ export const Weekly = ({ data, locale }) => {
 
   return (
     <div>{week_numbers.map((week, i) => (
-      <Week week={weeks[week]} withGap={!!i && (week - week_numbers[i - 1] > 1)} />
+      <Week
+        color={color}
+        minmax={[min, max]}
+        week={weeks[week]}
+        withGap={!!i && (week - week_numbers[i - 1] > 1)}
+      />
     ))}</div>
   )
 }
